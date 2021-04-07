@@ -54,6 +54,8 @@ validation_labels = labels[25000:35000]
 
 test_data = ready_data[35000:]
 test_labels = labels[35000:]
+
 model = keras.models.load_model('model')
 print(model.evaluate(test_data, test_labels))
+print(model.metrics_names)
 
