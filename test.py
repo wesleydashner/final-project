@@ -8,6 +8,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Embedding, LSTM
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow import keras
 import sklearn
 import nltk
 nltk.download('stopwords')
@@ -53,14 +54,6 @@ validation_labels = labels[25000:35000]
 
 test_data = ready_data[35000:]
 test_labels = labels[35000:]
+model = keras.models.load_model('model')
+print(model.evaluate(test_data, test_labels))
 
-model = Sequential()
-model.add(Embedding(max_features, 128))
-print(np.version.version)
-model.add(LSTM(128))
-model.add(Dense(32, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
-
-model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-history = model.fit(train_data, train_labels, epochs=10, validation_data=(validation_data, validation_labels))
-model.evaluate(test_data, test_labels)
