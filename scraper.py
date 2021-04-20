@@ -2,12 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 import numpy as np
 import pandas as pd
+import re
 
-def get_news_theonion():
-    
+
+def get_news_theOnion():
     # url definition
     url = "https://www.theonion.com"
-    
+
     # Request
     r1 = requests.get(url)
     r1.status_code
@@ -16,13 +17,13 @@ def get_news_theonion():
     coverpage = r1.content
 
     # Soup creation
-    soup1 = BeautifulSoup(coverpage, 'html5lib')
+    soup1 = BeautifulSoup(coverpage, 'html.parser')
 
     # News identification
-    coverpage_news = soup1.find_all('h3', class_='fc-item__title')
+    coverpage_news = soup1.find_all('h4', class_='sc-1qoge05-0 gWMyPL')
     len(coverpage_news)
-    
-    number_of_articles = 5
+
+    number_of_articles = 10
 
     # Empty lists for content, links and titles
     news_contents = []
@@ -33,12 +34,8 @@ def get_news_theonion():
 
     for n in np.arange(0, number_of_articles):
 
-        # We need to ignore "live" pages since they are not articles
-        if "live" in coverpage_news[n].find('a')['href']:  
-            continue
-
         # Getting the link of the article
-        link = coverpage_news[n].find('a')['href']
+        link = url + coverpage_news[n].find('a')['href']
         list_links.append(link)
 
         # Getting the title
@@ -46,7 +43,7 @@ def get_news_theonion():
         list_titles.append(title)
 
         # Getting Date
-        date = coverpage_news[n].find('date').get_text()
+        date = "4/20/2021"
         list_dates.append(date)
 
         # Getting Subject
@@ -56,28 +53,34 @@ def get_news_theonion():
         # Reading the content (it is divided in paragraphs)
         article = requests.get(link)
         article_content = article.content
-        soup_article = BeautifulSoup(article_content, 'html5lib')
-        body = soup_article.find_all('div', class_='content__article-body from-content-api js-article__body')
-        x = body[0].find_all('p')
+        soup_article = BeautifulSoup(article_content, 'html.parser')
+        body = soup_article.find_all('p', class_='mol-para-with-font')
 
         # Unifying the paragraphs
         list_paragraphs = []
-        for p in np.arange(0, len(x)):
-            paragraph = x[p].get_text()
+        for p in np.arange(0, len(body)):
+            paragraph = body[p].get_text()
             list_paragraphs.append(paragraph)
             final_article = " ".join(list_paragraphs)
+
+        # Removing special characters
+        final_article = re.sub("\\xa0", "", final_article)
 
         news_contents.append(final_article)
 
     # df_features
     df_features = pd.DataFrame(
-         {'title': list_titles,
-          'text': news_contents,
-          'subject': list_subjects,
-          'date': list_dates
-        })
+        {'title': list_titles,
+         'text': news_contents,
+         'subject': list_subjects,
+         'date': list_dates
+         })
 
-    
-    return (df_features)
+    return df_features
 
-    df = get_news_theonion()
+
+df = get_news_theOnion()
+
+print(df.head)
+
+df.to_csv(r'/Users/CSUser/Documents/CS_5830/Final_Project/final-project/theOnion_articles.csv', index=False)
