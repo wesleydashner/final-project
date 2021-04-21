@@ -5,9 +5,9 @@ import pandas as pd
 import re
 
 
-def get_news_ESPN():
+def get_news_theOnion():
     # url definition
-    url = "http://www.espn.com/espn/latestnews"
+    url = "https://www.theonion.com/c/news-in-brief"
 
     # Request
     r1 = requests.get(url)
@@ -19,7 +19,7 @@ def get_news_ESPN():
     # Soup creation
     soup1 = BeautifulSoup(coverpage, 'html.parser')
     # News identification
-    coverpage_news = soup1.find_all('ul', class_="inline-list indent")
+    coverpage_news = soup1.find_all('div', class_="cw4lnv-5 aoiLP")
     print(len(coverpage_news))
     print(coverpage_news)
 
@@ -32,7 +32,7 @@ def get_news_ESPN():
     list_subjects = []
     list_dates = []
 
-    for n in np.arange(0, len(coverpage_news)):
+    for n in np.arange(0, number_of_articles):
 
         # Getting the link of the article
         link = coverpage_news[n].find('a')['href']
@@ -47,7 +47,7 @@ def get_news_ESPN():
         list_dates.append(date)
 
         # Getting Subject
-        subject = "Sports News"
+        subject = "Political News"
         list_subjects.append(subject)
 
         # Reading the content (it is divided in paragraphs)
@@ -79,8 +79,8 @@ def get_news_ESPN():
     return df_features
 
 
-df = get_news_ESPN()
+df = get_news_theOnion()
 
 print(df.head)
 
-df.to_csv(r'/Users/CSUser/Documents/CS_5830/Final_Project/final-project/data/ESPN_articles.csv', index=False)
+df.to_csv(r'/Users/CSUser/Documents/CS_5830/Final_Project/final-project/data/theOnion_articles.csv', index=False)
