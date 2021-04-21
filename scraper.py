@@ -5,9 +5,9 @@ import pandas as pd
 import re
 
 
-def get_news_theOnion():
+def get_news_ESPN():
     # url definition
-    url = "https://www.theonion.com"
+    url = "http://www.espn.com/espn/latestnews"
 
     # Request
     r1 = requests.get(url)
@@ -18,10 +18,10 @@ def get_news_theOnion():
 
     # Soup creation
     soup1 = BeautifulSoup(coverpage, 'html.parser')
-
     # News identification
-    coverpage_news = soup1.find_all('h4', class_='sc-1qoge05-0 gWMyPL')
-    len(coverpage_news)
+    coverpage_news = soup1.find_all('ul', class_="inline-list indent")
+    print(len(coverpage_news))
+    print(coverpage_news)
 
     number_of_articles = 10
 
@@ -32,10 +32,10 @@ def get_news_theOnion():
     list_subjects = []
     list_dates = []
 
-    for n in np.arange(0, number_of_articles):
+    for n in np.arange(0, len(coverpage_news)):
 
         # Getting the link of the article
-        link = url + coverpage_news[n].find('a')['href']
+        link = coverpage_news[n].find('a')['href']
         list_links.append(link)
 
         # Getting the title
@@ -47,14 +47,14 @@ def get_news_theOnion():
         list_dates.append(date)
 
         # Getting Subject
-        subject = "News"
+        subject = "Sports News"
         list_subjects.append(subject)
 
         # Reading the content (it is divided in paragraphs)
         article = requests.get(link)
         article_content = article.content
         soup_article = BeautifulSoup(article_content, 'html.parser')
-        body = soup_article.find_all('p', class_='mol-para-with-font')
+        body = soup_article.find_all('p')
 
         # Unifying the paragraphs
         list_paragraphs = []
@@ -79,8 +79,8 @@ def get_news_theOnion():
     return df_features
 
 
-df = get_news_theOnion()
+df = get_news_ESPN()
 
 print(df.head)
 
-df.to_csv(r'/Users/CSUser/Documents/CS_5830/Final_Project/final-project/theOnion_articles.csv', index=False)
+df.to_csv(r'/Users/CSUser/Documents/CS_5830/Final_Project/final-project/data/ESPN_articles.csv', index=False)
