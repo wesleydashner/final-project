@@ -5,9 +5,9 @@ import pandas as pd
 import re
 
 
-def get_news_theOnion():
+def get_news_FOX():
     # url definition
-    url = "https://www.theonion.com/c/news-in-brief"
+    url = "https://www.foxnews.com"
 
     # Request
     r1 = requests.get(url)
@@ -19,12 +19,18 @@ def get_news_theOnion():
     # Soup creation
     soup1 = BeautifulSoup(coverpage, 'html.parser')
     # News identification
-    coverpage_news = soup1.find_all('div', class_="cw4lnv-5 aoiLP")
+    coverpage_news = soup1.find_all('h2', class_="title")
     print(len(coverpage_news))
-    print(coverpage_news)
+
+
+    passable_news = []
+    for n in np.arange(0,len(coverpage_news)):
+        link = coverpage_news[n].find('a')['href']
+        if link[0:10] != "https://vi":
+            passable_news.append(link)
 
     number_of_articles = 10
-
+    print(passable_news)
     # Empty lists for content, links and titles
     news_contents = []
     list_links = []
@@ -35,7 +41,7 @@ def get_news_theOnion():
     for n in np.arange(0, number_of_articles):
 
         # Getting the link of the article
-        link = coverpage_news[n].find('a')['href']
+        link = passable_news[n]
         list_links.append(link)
 
         # Getting the title
@@ -79,8 +85,8 @@ def get_news_theOnion():
     return df_features
 
 
-df = get_news_theOnion()
+df = get_news_FOX()
 
 print(df.head)
 
-df.to_csv(r'/Users/CSUser/Documents/CS_5830/Final_Project/final-project/data/theOnion_articles.csv', index=False)
+df.to_csv(r'/Users/CSUser/Documents/CS_5830/Final_Project/final-project/data/FOXNews_articles.csv', index=False)
